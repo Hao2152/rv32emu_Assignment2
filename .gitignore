@@ -1,0 +1,6 @@
+test.elf
+*.o
+*.log
+*.out
+build/
+

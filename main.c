@@ -25,6 +25,7 @@
 
 extern uint64_t get_cycles(void);
 extern uint64_t get_instret(void);
+extern void uf8_main(void);
 
 /* Bare metal memcpy implementation */
 void *memcpy(void *dest, const void *src, size_t n)
@@ -597,124 +598,14 @@ static void test_bf16_special_cases(void)
         TEST_LOGGER("FAILED\n");
     }
 }
-
+int putchar(int c) {
+    char ch = (char)c;
+    printstr(&ch, 1);
+    return (unsigned char)ch;
+}
 int main(void)
 {
-    uint64_t start_cycles, end_cycles, cycles_elapsed;
-    uint64_t start_instret, end_instret, instret_elapsed;
-
-    TEST_LOGGER("\n=== ChaCha20 Tests ===\n\n");
-
-    /* Test 0: ChaCha20 */
-    TEST_LOGGER("Test 0: ChaCha20 (RISC-V Assembly)\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_chacha20();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
-
-    TEST_LOGGER("\n=== BFloat16 Tests ===\n\n");
-
-    /* Test 1: Addition */
-    TEST_LOGGER("Test 1: bf16_add\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_bf16_add();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
-
-    /* Test 2: Subtraction */
-    TEST_LOGGER("Test 2: bf16_sub\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_bf16_sub();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
-
-    /* Test 3: Multiplication */
-    TEST_LOGGER("Test 3: bf16_mul\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_bf16_mul();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
-
-    /* Test 4: Division */
-    TEST_LOGGER("Test 4: bf16_div\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_bf16_div();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
-
-    /* Test 5: Special cases */
-    TEST_LOGGER("Test 5: bf16_special_cases\n");
-    start_cycles = get_cycles();
-    start_instret = get_instret();
-
-    test_bf16_special_cases();
-
-    end_cycles = get_cycles();
-    end_instret = get_instret();
-    cycles_elapsed = end_cycles - start_cycles;
-    instret_elapsed = end_instret - start_instret;
-
-    TEST_LOGGER("  Cycles: ");
-    print_dec((unsigned long) cycles_elapsed);
-    TEST_LOGGER("  Instructions: ");
-    print_dec((unsigned long) instret_elapsed);
-
-    TEST_LOGGER("\n=== All Tests Completed ===\n");
+    uf8_main();
 
     return 0;
 }
