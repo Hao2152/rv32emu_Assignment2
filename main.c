@@ -26,6 +26,7 @@
 extern uint64_t get_cycles(void);
 extern uint64_t get_instret(void);
 extern void uf8_main(void);
+extern void quiz2_problemA_main(void);
 
 /* Bare metal memcpy implementation */
 void *memcpy(void *dest, const void *src, size_t n)
@@ -605,7 +606,37 @@ int putchar(int c) {
 }
 int main(void)
 {
-    uf8_main();
+    uint64_t start_cycles, end_cycles, cycles_elapsed;
+    uint64_t start_instret, end_instret, instret_elapsed;
 
+    TEST_LOGGER("\n=== Hw1 Code Tests ===\n\n");
+    start_cycles = get_cycles();
+    start_instret = get_instret();
+    uf8_main();
+    end_cycles = get_cycles();
+    end_instret = get_instret();
+    cycles_elapsed = end_cycles - start_cycles;
+    instret_elapsed = end_instret - start_instret;
+    TEST_LOGGER("  Cycles: ");
+    print_dec((unsigned long) cycles_elapsed);
+    TEST_LOGGER("  Instructions: ");
+    print_dec((unsigned long) instret_elapsed);
+    TEST_LOGGER("\n\n\n");
+
+
+    TEST_LOGGER("\n=== Quiz2 ProblemA Tests ===\n\n");
+    start_cycles = get_cycles();
+    start_instret = get_instret();
+    quiz2_problemA_main();
+    end_cycles = get_cycles();
+    end_instret = get_instret();
+    cycles_elapsed = end_cycles - start_cycles;
+    instret_elapsed = end_instret - start_instret;
+
+    TEST_LOGGER("  Cycles: ");
+    print_dec((unsigned long) cycles_elapsed);
+    TEST_LOGGER("  Instructions: ");
+    print_dec((unsigned long) instret_elapsed);
+    TEST_LOGGER("\n");
     return 0;
 }
