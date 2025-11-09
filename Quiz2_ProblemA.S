@@ -17,15 +17,12 @@ pow10_tbl:
 
     .balign 1
 obdata:     .byte 0x3c, 0x3b, 0x3a
-# decode: (byte ^ 0x6F) - 0x12  → printable letter (A/B/C)
 
-# =================================================================
+
     .section .text
     .globl quiz2_problemA_main
     .extern putchar
 
-# ---------------------------------------------------------------
-# write_stdout(a0=ptr, a1=len)
 write_stdout:
     addi    sp, sp, -16
     sw      ra, 12(sp)
@@ -43,7 +40,7 @@ write_stdout:
     addi    sp, sp, 16
     ret
 
-# putc(a0=char)
+
 putc:
     addi    sp, sp, -16
     sw      ra, 12(sp)
@@ -52,7 +49,6 @@ putc:
     addi    sp, sp, 16
     ret
 
-# print_dec20(a0=value)
 print_dec20:
     addi    sp, sp, -32
     sw      ra, 28(sp)
@@ -101,8 +97,6 @@ dec20_epilogue:
     addi    sp, sp, 32
     ret
 
-# ---------------------------------------------------------------
-# quiz2_problemA_main
 quiz2_problemA_main:
     addi    sp, sp, -32
     sw      ra, 28(sp)
@@ -111,26 +105,23 @@ quiz2_problemA_main:
     sw      s2, 16(sp)
     sw      s3, 12(sp)
 
-    # 初始化盤子位置
     li      s1, 0
     li      s2, 0
     li      s3, 0
-    li      s0, 1          # loop counter n=1..7
+    li      s0, 1         
 
 loop:
     li      t0, 8
     bge     s0, t0, finish
 
-    # Gray code 計算
     mv      t1, s0
     srli    t2, t1, 1
-    xor     t2, t2, t1     # gray(n)
+    xor     t2, t2, t1     
     addi    t3, s0, -1
     srli    t4, t3, 1
-    xor     t4, t4, t3     # gray(n-1)
-    xor     t5, t2, t4     # changed bits
+    xor     t4, t4, t3   
+    xor     t5, t2, t4     
 
-    # 哪片盤子要動
     andi    t6, t5, 1
     bnez    t6, disk0
     andi    t6, t5, 2
@@ -144,16 +135,14 @@ disk0:
     li      t6, 0
 disk_sel:
 
-    # 把三片位置存到 t4,t5,t6
     mv      t4, s1
     mv      t5, s2
     mv      t6, s3
 
-    # old_pos
     beqz    t6, pos0
     li      t0, 1
     beq     t6, t0, pos1
-    mv      t1, t6         # disk2
+    mv      t1, t6         
     j       got_old
 pos1:
     mv      t1, t5
@@ -162,7 +151,6 @@ pos0:
     mv      t1, t4
 got_old:
 
-    # new_pos 計算
     beqz    t6, small_move
     li      t0, 3
     sub     t2, t0, t1
@@ -174,23 +162,20 @@ small_move:
     blt     t2, t0, ready
     sub     t2, t2, t0
 ready:
-
-    # 轉換成字元
     la      t0, obdata
     add     t3, t0, t1
     lbu     t3, 0(t3)
     li      t4, 0x6F
     xor     t3, t3, t4
-    addi    t3, t3, -0x12  # from_char
+    addi    t3, t3, -0x12  
 
     la      t0, obdata
     add     t4, t0, t2
     lbu     t4, 0(t4)
     li      t5, 0x6F
     xor     t4, t4, t5
-    addi    t4, t4, -0x12  # to_char
+    addi    t4, t4, -0x12 
 
-    # ---------- 輸出 ----------
     la      a0, str_move
     li      a1, str_move_len
     jal     ra, write_stdout
@@ -216,7 +201,6 @@ ready:
     li      a1, nl_len
     jal     ra, write_stdout
 
-    # 更新新位置
     beqz    t6, upd0
     li      t0, 1
     beq     t6, t0, upd1
