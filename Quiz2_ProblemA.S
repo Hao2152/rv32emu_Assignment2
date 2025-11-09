@@ -23,6 +23,9 @@ obdata:     .byte 0x3c, 0x3b, 0x3a
     .globl quiz2_problemA_main
     .extern putchar
 
+# --------------------------------------------------------------------
+# Utility: write_stdout / putc / print_dec20
+# --------------------------------------------------------------------
 write_stdout:
     addi    sp, sp, -16
     sw      ra, 12(sp)
@@ -39,7 +42,6 @@ write_stdout:
     lw      ra, 12(sp)
     addi    sp, sp, 16
     ret
-
 
 putc:
     addi    sp, sp, -16
@@ -97,64 +99,71 @@ dec20_epilogue:
     addi    sp, sp, 32
     ret
 
-quiz2_problemA_main:
-    addi    sp, sp, -32
-    sw      ra, 28(sp)
-    sw      s0, 24(sp)
-    sw      s1, 20(sp)
-    sw      s2, 16(sp)
-    sw      s3, 12(sp)
 
-    li      s1, 0
-    li      s2, 0
-    li      s3, 0
-    li      s0, 1         
+# --------------------------------------------------------------------
+# Main: Quiz2_ProblemA
+# --------------------------------------------------------------------
+quiz2_problemA_main:
+    addi    sp, sp, -40
+    sw      ra, 36(sp)
+    sw      s0, 32(sp)
+    sw      s1, 28(sp)
+    sw      s2, 24(sp)
+    sw      s3, 20(sp)
+    sw      s4, 16(sp)
+
+    li      s1, 0      # disk0 pos
+    li      s2, 0      # disk1 pos
+    li      s3, 0      # disk2 pos
+    li      s0, 1      # n counter
+    li      s4, 0      # prev_gray
 
 loop:
     li      t0, 8
     bge     s0, t0, finish
 
+    # compute gray(n)
+    mv      t4, s4              # prev gray(n-1)
     mv      t1, s0
     srli    t2, t1, 1
-    xor     t2, t2, t1     
-    addi    t3, s0, -1
-    srli    t4, t3, 1
-    xor     t4, t4, t3   
-    xor     t5, t2, t4     
+    xor     t2, t2, t1          # gray(n)
+    xor     t5, t2, t4          # changed bits
+    mv      s4, t2              # store gray(n) as next prev_gray
 
-    andi    t6, t5, 1
-    bnez    t6, disk0
-    andi    t6, t5, 2
-    bnez    t6, disk1
-    li      t6, 2
-    j       disk_sel
+    # determine which disk moved
+    li      t6, 0
+    andi    t0, t5, 1
+    bnez    t0, disk_found
+    andi    t0, t5, 2
+    bnez    t0, disk1
+    andi    t0, t5, 4
+    bnez    t0, disk2
+    j       disk_found
 disk1:
     li      t6, 1
-    j       disk_sel
-disk0:
-    li      t6, 0
-disk_sel:
+    j       disk_found
+disk2:
+    li      t6, 2
+disk_found:
 
-    mv      t4, s1
-    mv      t5, s2
-    mv      t6, s3
-
-    beqz    t6, pos0
+    # load old position
+    beqz    t6, use_d0
     li      t0, 1
-    beq     t6, t0, pos1
-    mv      t1, t6         
+    beq     t6, t0, use_d1
+    mv      t1, s3
     j       got_old
-pos1:
-    mv      t1, t5
+use_d1:
+    mv      t1, s2
     j       got_old
-pos0:
-    mv      t1, t4
+use_d0:
+    mv      t1, s1
 got_old:
 
+    # compute new position
     beqz    t6, small_move
     li      t0, 3
     sub     t2, t0, t1
-    sub     t2, t2, t4
+    sub     t2, t2, s1          # use disk0 reference
     j       ready
 small_move:
     addi    t2, t1, 2
@@ -162,6 +171,8 @@ small_move:
     blt     t2, t0, ready
     sub     t2, t2, t0
 ready:
+
+    # decode peg name (A/B/C)
     la      t0, obdata
     add     t3, t0, t1
     lbu     t3, 0(t3)
@@ -176,6 +187,7 @@ ready:
     xor     t4, t4, t5
     addi    t4, t4, -0x12 
 
+    # print "Move Disk X from Y to Z"
     la      a0, str_move
     li      a1, str_move_len
     jal     ra, write_stdout
@@ -201,6 +213,7 @@ ready:
     li      a1, nl_len
     jal     ra, write_stdout
 
+    # update disk position
     beqz    t6, upd0
     li      t0, 1
     beq     t6, t0, upd1
@@ -217,10 +230,11 @@ next:
     j       loop
 
 finish:
-    lw      s3, 12(sp)
-    lw      s2, 16(sp)
-    lw      s1, 20(sp)
-    lw      s0, 24(sp)
-    lw      ra, 28(sp)
-    addi    sp, sp, 32
+    lw      s4, 16(sp)
+    lw      s3, 20(sp)
+    lw      s2, 24(sp)
+    lw      s1, 28(sp)
+    lw      s0, 32(sp)
+    lw      ra, 36(sp)
+    addi    sp, sp, 40
     ret
