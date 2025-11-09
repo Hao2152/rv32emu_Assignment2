@@ -637,6 +637,6 @@ int main(void)
     print_dec((unsigned long) cycles_elapsed);
     TEST_LOGGER("  Instructions: ");
     print_dec((unsigned long) instret_elapsed);
-    TEST_LOGGER("\n");
+    TEST_LOGGER("\n\n\n");
     return 0;
 }
