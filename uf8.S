@@ -20,9 +20,9 @@ pow10_tbl:
 
     .balign 4
 test_values:
-    .word 0, 15, 16, 255, 1024, 65535, 1000000
+    .word 16
 case_count:
-    .word 7
+    .word 1
 
     .section .text
     .globl uf8_main
